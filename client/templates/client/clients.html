@@ -1,0 +1,42 @@
+<h1>Show recent clients streaming from this server: {{ localhost }}</h1>
+{% if vclients %}
+<table style="width:80%">
+    <tr>
+	<td> Client ID </td>
+	<td> Client Name </td>
+	<td> Client IP </td>
+	<td> Last Visit </td>
+    </tr>
+    {% for vc in vclients %}
+    <tr>
+	<td> {{ vc.id }} </td>
+	<td> {{ vc.name }} </td>
+	<td> {{ vc.ip }} </td>
+	<td> {{ vc.last_visit }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>There is no clients streaming from this video server recently!</p>
+{% endif %}
+<h1>Show client agents closeby connecting to this cache agent: {{ localhost }}</h1>
+{% if pclients %}
+<table style="width:80%">
+    <tr>
+	<td> Client ID </td>
+	<td> Client Name </td>
+	<td> Client IP </td>
+	<td> Last Visit </td>
+    </tr>
+    {% for pc in pclients %}
+    <tr>
+	<td> {{ pc.id }} </td>
+	<td> {{ pc.name }} </td>
+	<td> {{ pc.ip }} </td>
+	<td> {{ pc.last_visit }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>There is no client agents nearby connecting to this cache agent recently!</p>
+{% endif %}

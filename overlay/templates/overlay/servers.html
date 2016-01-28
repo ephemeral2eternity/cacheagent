@@ -1,0 +1,43 @@
+<h1>Show all the cache servers and their rtts to the current agent!</h1>
+{% if curSrv %}
+<h2>The current server name is : {{ curSrv.name }}</h2>
+{% endif %}
+{% if srvs %}
+<h2>All available cache servers observed from the current server are:</h2>
+<table style="width:100%">
+    <tr>
+	<td> Cache Server ID</td>
+	<td> Cache Server Name</td>
+	<td> IP Address</td>
+	<td> RTT to {{ curSrv.name }} </td>
+	<td> Hop number to {{ curSrv.name }} </td>
+	<td> Recent QoE Evaluated (0-5) </td>
+	<td> Recent Load Monitored (# of requests per 5 minutes) </td>
+	<td> Recent BW Monitored (Mbps) </td>
+    <tr>
+    {% for srv in srvs %}
+    <tr>
+        <td> {{ srv.id }} </td>
+        <td> {{ srv.name }} </td>
+	<td> {{ srv.ip }} </td>
+	<td> {{ srv.rtt }} </td>
+	<td> {{ srv.hop }} </td>
+	<td> {{ srv.qoe }} </td>
+	<td> {{ srv.load }} </td>
+	<td> {{ srv.bw }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No servers has been initialized in the Server Model. Please run http://cache_agent:port/overlay/init/.</p>
+{% endif %}
+{% if peers %}
+<h2>All peer agents connected to the current server are:</h2>
+    <dl>
+    {% for peer in peers %}
+        <dt>Peer Agent Name: {{ peer.name }} </dt>
+    {% endfor %}
+    </dl>
+{% else %}
+    <p>The server has not been connected to the overlay. Please re-run http://cache_agent:port/overlay/init/ to connect!</p>
+{% endif %}

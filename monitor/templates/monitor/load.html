@@ -1,0 +1,23 @@
+{% if cur_host %}
+<h1>Show the 30 recent load monitored on this agent: {{ cur_host }}</h1>
+{% endif %}
+{% if load_list %}
+<table style="width:100%">
+    <tr>
+	<td>Monitored Item ID</td>
+	<td>Monitored Time</td>
+	<td>Monitored Server Load (# of chunk requests in 5 minutes)</td>
+	<td>Server Total Load (Total # of chunk requests received)</td>
+    </tr>
+    {% for item in load_list %}
+    <tr>
+	<td> {{ item.id }} </td>
+	<td> {{ item.time }} </td>
+	<td> {{ item.load }} </td>
+	<td> {{ item.total }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No Load has been monitored yet.</p>
+{% endif %}

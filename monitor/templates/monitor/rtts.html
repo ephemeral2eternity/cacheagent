@@ -1,0 +1,19 @@
+{% if cur_host %}
+<h1>Show the 30 recent rtts monitored on this agent: {{ cur_host }}</h1>
+{% endif %}
+{% if rtts %}
+<table style="width:100%">
+    <tr>
+	<td>Monitored Time</td>
+	<td>Monitored RTTS to all servers</td>
+    </tr>
+    {% for item in rtts %}
+    <tr>
+	<td> {{ item.time }} </td>
+	<td> {{ item.rtts }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No RTTS has been monitored yet.</p>
+{% endif %}

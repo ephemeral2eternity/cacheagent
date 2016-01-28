@@ -1,0 +1,49 @@
+<h1>Distributed Cache Agent Deployed in Each Video Server</h1>
+<p>This is a cache agent deployed in video servers that are responsible to 1) connect to other cache agents in an overlay network; 2) monitor RTT, bw, server load on video servers; 3) discover multiple candidate servers caching a certain video (Multi-Candidate Content Delivery); 4) monitor and update Server QoE Score (SQS) on all candidate servers; 5) record latest clients visiting this cache agent or this video server.</p>
+<h2>Overlay Module</h2>
+<p>The overlay module provides the interface to 1) initialize overlay table by communicating with all other cache agents on port 8615; 2) accept other cache agents' update message on informing the current agent about others' load, bw, rtt, and Server QoE Score (SQS) to this cache agent; 3) accept others' peering request, connect peer, and add peers in their peer list; 4) accept the delete request from a peer to delete it from current agent's peer list; 5) delete current node from all other peers' peer list; 6) accept node add request to add a node on current agent's overlay table.</p>
+<ul>
+	<li><a href="/overlay/">Brief description of overlay module!</a></li>
+	<li>Accepting Removing Request to remove a peer from current peer list or to remove a node from current overlay table: /overlay/remove?srv=srvname, /overlay/remove?peer=peerName</li>
+	<li><a href="/overlay/init/">Initialize overlay table with all available cache agents and connect to the overlay by connecting to the closest cache agent.</a></li>
+	<li><a href="/overlay/query/">Show all the nodes' info in the overlay and their load, bw, qoe, and rtts to the current node!</a></li>
+	<li>Accept Updating Request from peers to update other peers' load, bw, SQS, and rtts to current agent: /overlay/update?srv=srv_name&amp;bw=bw_value&amp;load=load_value&amp;qoe=SQS</li>
+	<li>Accept Peering Request: /overlay/peer/ (POST method) that posts the peer's name and id that sends the request, so the current agent can add it into its peer list.</li>
+	<li><a href="/overlay/delete/">Delete current agent from all peers' peer list and server list.</a></li>
+	<li>Accept Peer's Adding Request to add other peer as a server node in current agent's overlay table: /over/add?srv=srv_name</li>
+</ul>
+<h2>Monitoring Module</h2>
+<p>The monitoring module of a cache agent includes periodic probing of server load and server outbound/inbound bandwidth.</p>
+<ul>
+	<li><a href="/monitor/">Show all monitored information for current server</a></li>
+	<li><a href="/monitor/load/">Show recent load on current server</a></li>
+	<li><a href="/monitor/bw/">Show recent outbound/inbound traffic on current server</a></li>
+	<li><a href="/monitor/sys/">Show recent system stats on current server</a></li>
+	<li><a href="/monitor/rtts/">Show the RTTs from current server to all other servers</a></li>
+	<li><a href="/monitor/dump/">Dump data from database to /tmp/cacheagent_ts_datatype.js</a></li>
+</ul>
+<h2>Content Discovery Module</h2>
+<p>This module is responsible to 1) initialize the cache table on each server; 2) discover candidate servers for all content; 3) show the cache table; 4) receiving ADD request from other cache agents and add other servers as candidate servers in its own cache table; 5) periodically send out local cached video list to other cache agents; 6) get a selected server for a client request according to the method denoted: qoe, load, rtt, hop, random.</p>
+<ul>
+	<li><a href="/video/">Show the current cache agent's cache table</a></li>
+	<li><a href="/video/init/">Initialize current agent's cache table from locally cache videos defined by configuration files in vidList folder</a></li>
+	<li>Accepting ADD request from other cache agents, /video/add/ (POST method) posts video lists to be added on the current cache agent.</li>
+	<li><a href="/video/discover/">Periodically send out locally cache video list</a></li>
+	<li>Getting a server for a video request: /video/getSrv?method=qoe, rtt, load, hop, random</li>
+</ul>
+<h2>Server QoE Score (SQS) Module</h2>
+<p>This module is responsible to show the server QoE monitored by clients connecting to this cache agent. It includes APIS for 1) initialize the SQS for all servers; 2) Show the latest SQS for all available servers observed from current cache agent; 3) accept QoE UPDATE message from clients; 4) dump SQS scores in the history to Google Cloud Storage</p>
+<ul>
+	<li><a href="/qoe/query/">Show the latest SQS table for all cache agents</a></li>
+	<li><a href="/qoe/init/">Initialize SQS table as default setting (5 for current server and 4 for all others)</a></li>
+	<li>Receiving QoE UPDATE message from client, /qoe/update?srv=srv_name&amp;qoe=qoe_value&amp;alpha=alpha_value</li>
+	<li><a href="/qoe/dump/">Dump existing SQS table to Google Cloud Storage</a></li>
+</ul>
+<h2>Client Request Monitoring Module</h2>
+<p>Show the latest clients' addresses that have visited the cache agent or the current cache server recently. This module can return three types of clients: 1) the latest 20 clients connecting to the current cache agent; 2) the latest 20 clients streaming videos from the current server; 3) the latest 5 clients downloading the same video from current server.</p>
+<ul>
+	<li><a href="/client/query/">Show the latest clients visiting current cache agent and current video server</a></li>
+	<li><a href="/client/pclient/">Show the latest clients closeby, that have visited current cache agent</a></li>
+	<li><a href="/client/vclient/">Show the latest clients streaming videos from the current server</a></li>
+	<li>Accepting ADD Request from a client closeby, adding the client as recent clients connecting the current cache agent (redirector). /client/add?client_name: client ip retrieved from the "REMOTE_HOST" field in the request.</li>
+</ul>

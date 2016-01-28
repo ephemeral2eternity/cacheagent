@@ -1,0 +1,39 @@
+{% if cur_host %}
+<h1>Show the 30 recent system stats monitored on this agent: {{ cur_host }}</h1>
+{% endif %}
+{% if sys_stat_list %}
+<table style="width:100%">
+    <tr>
+	<td>Time</td>
+	<td>CPU Utilization (%)</td>
+	<td>Memory Utilization (%)</td>
+	<td>I/O Transfers Per Second</td>
+	<td>I/O Read Blocks Per Second</td>
+	<td>I/O Write Blocks Per Second</td>
+	<td>Inbound Traffic (kbps)</td>
+	<td>Outbound Traffic (kbps)</td>
+	<td>Total I/O Reads (Bytes)</td>
+	<td>Total I/O Writes (Bytes)</td>
+	<td>Total Traffic Sent (Bytes)</td>
+	<td>Total Traffic Received (Bytes)</td>
+    </tr>
+    {% for item in sys_stat_list %}
+    <tr>
+	<td> {{ item.time }} </td>
+	<td> {{ item.cpu_util }} </td>
+	<td> {{ item.mem_util }} </td>
+	<td> {{ item.io_tps }} </td>
+	<td> {{ item.io_readblks }} </td>
+	<td> {{ item.io_writeblks }} </td>
+	<td> {{ item.inbound_traffic }} </td>
+	<td> {{ item.outbound_traffic }} </td>
+	<td> {{ item.total_io_read }} </td>
+	<td> {{ item.total_io_write }} </td>
+	<td> {{ item.total_tx_bytes }} </td>
+	<td> {{ item.total_rx_bytes }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No Load has been monitored yet.</p>
+{% endif %}

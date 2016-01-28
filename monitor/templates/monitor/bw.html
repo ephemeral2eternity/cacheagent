@@ -1,0 +1,23 @@
+{% if cur_host %}
+<h1>Show the 30 recent bw monitored on this agent: {{ cur_host }}</h1>
+{% endif %}
+{% if bw_list %}
+<table style="width:90%">
+    <tr>
+	<td>Monitored ID</td>
+	<td>Monitored Time</td>
+	<td>Monitored BW in 5 minutes (Mbps)</td>
+	<td>Total Outbound Traffic (Bytes)</td>
+    </tr>
+    {% for item in bw_list %}
+    <tr>
+	<td> {{ item.id }} </td>
+	<td> {{ item.time }} </td>
+	<td> {{ item.bw }} </td>
+	<td> {{ item.tx }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No bw has been monitored yet.</p>
+{% endif %}
