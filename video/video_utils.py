@@ -40,7 +40,7 @@ def get_local_name():
 # ==============================================================
 def get_real_local_videos():
 	cached_videos = []
-	abspath = os.path.expanduser("~/videos/")
+	abspath = os.path.expanduser("/home/chenw/videos/")
 	dirs = filter(os.path.isdir, [os.path.join(abspath, f) for f in os.listdir(abspath)]) # ; print flist
 	# print "Locally cached videos are: ", dirs
 	for video in dirs:
