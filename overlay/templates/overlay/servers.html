@@ -11,7 +11,8 @@
 	<td> IP Address</td>
 	<td> RTT to {{ curSrv.name }} </td>
 	<td> Hop number to {{ curSrv.name }} </td>
-	<td> Recent QoE Evaluated (0-5) </td>
+	<td> Recent SQS Evaluated by Window Average (0-5) </td>
+	<td> Recent SQS Evaluated by Exponential Average (0-5) </td>
 	<td> Recent Load Monitored (# of requests per 5 minutes) </td>
 	<td> Recent BW Monitored (Mbps) </td>
     <tr>
@@ -22,7 +23,8 @@
 	<td> {{ srv.ip }} </td>
 	<td> {{ srv.rtt }} </td>
 	<td> {{ srv.hop }} </td>
-	<td> {{ srv.qoe }} </td>
+	<td> {{ srv.ave_sqs }} </td>
+	<td> {{ srv.exp_sqs }} </td>
 	<td> {{ srv.load }} </td>
 	<td> {{ srv.bw }} </td>
     </tr>

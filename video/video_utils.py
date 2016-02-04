@@ -118,7 +118,7 @@ def update_list2str(update_list):
 #		       'load' : always selects the server with the lightest load
 #                      'rtt' : always selects the server with the smallest rtt
 # ================================================================================
-def get_server(vidID, method):
+def get_server(vidID, method, sqs_method='exp', action='greedy', epsilon=0.1):
 	curVid = Video.objects.get(pk=vidID)
 	vidName = curVid.name
 	srvs = curVid.srvs.split(',')
@@ -132,7 +132,10 @@ def get_server(vidID, method):
 		print("Check Server", srv, 'with srv_id', srv_id)
 		srv_obj = Server.objects.get(pk=srv_id)
 		if method == 'qoe':
-			srvs_vals[srv_id] = 5.0 - float(srv_obj.qoe)
+			if sqs_method == 'ave':
+				srvs_vals[srv_id] = 5.0 - float(srv_obj.ave_sqs)
+			else:
+				srvs_vals[srv_id] = 5.0 - float(srv_obj.exp_sqs)
 		elif method == 'load':
 			srvs_vals[srv_id] = int(srv_obj.load)
 		elif method == 'rtt':
@@ -147,7 +150,15 @@ def get_server(vidID, method):
 	# print(srvs_vals)
 
 	# Select the server with the least value in srvs_vals
-	selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
+	if action == "greedy":
+		selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
+	elif action == "epsilon":
+		rnd = random.random()
+		if rnd < epsilon:
+			selected_srv = random.choice(srvs_vals.keys())
+		else:
+			selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
+
 	selected_srv_obj = Server.objects.get(pk=selected_srv_id)
 	selected_srv['srv'] = selected_srv_obj.name
 	selected_srv['ip'] = selected_srv_obj.ip
@@ -156,6 +167,22 @@ def get_server(vidID, method):
 
 #cached_videos = get_real_local_videos()
 #print(cached_videos)
+
+# ================================================================================
+# Get candidate serveres for a video request
+# @input : vidID ---- the ID of the video user is requesting
+# ================================================================================
+def get_candidates(vidID):
+	candidates = {}
+	curVid = Video.objects.get(pk=vidID)
+	srvs = curVid.srvs.split(',')
+	srvs.pop()		## Pop the last empty string item
+
+	for srv in srvs:
+		srv_id = int(re.findall(r'\d+', srv)[0])
+		srv_obj = Server.objects.get(pk=srv_id)
+		candidates[srv_obj.name] = srv_obj.ip
+	return candidates
 
 # ==============================================================
 # Initialize the cache table for current node

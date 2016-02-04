@@ -47,7 +47,11 @@ def update(request):
 				alpha = float(update_dict['alpha'][0])
 			else:
 				alpha = 0.1
-			updateQoE(srv, qoe, alpha)
+			if 'win' in update_dict.keys():
+				window = int(update_dict['win'][0])
+			else:
+				window = 10
+			updateQoE(srv, qoe, alpha, window)
 		else:
 			print('QoE update message needs to denote the qoe in request ', params)
 			raise Http404

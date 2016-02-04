@@ -52,21 +52,30 @@ def getQoEStr():
 #	   qoe ---- new qoe value received for the srv
 #          alpha ---- the weight to be given to the new QoE value
 # ================================================================================
-def updateQoE(srv, qoe, alpha):
+def updateQoE(srv, qoe, alpha=0.1, window=6):
 	## Revision by chenw-2015-0317, read QoE updated to overlay not the previous sample.
 	# last_qoe = QoE.objects.filter(srv=srv).order_by('-time')[0]
 	# print('Last qoe value for server ', srv, ' is ', last_qoe.qoe)
 	# previous_qoe = float(last_qoe.qoe)
+	new_qoe_obj = QoE(qoe=qoe, srv=srv)
+	new_qoe_obj.save()
+	print('New qoe is ', qoe)
 	
-	## Read QoE updated to the overlay last time
+	## Get the server's previous exp_sqs and update exp_sqs
 	srv_id = int(re.findall(r'\d+', srv)[0])
 	srv_obj = Server.objects.get(pk=srv_id)
-	previous_qoe = float(srv_obj.qoe)
-	new_qoe = (1 - alpha) * previous_qoe + alpha * qoe
-	print('New qoe is ', new_qoe)
-	new_qoe_obj = QoE(qoe=new_qoe, srv=srv)
-	new_qoe_obj.save()
-	update_overlay_qoe(srv, new_qoe)
+	previous_exp_sqs= float(srv_obj.exp_sqs)
+	exp_sqs = (1 - alpha) * previous_exp_sqs + alpha * qoe
+
+	## Get the server's ave_sqs for server, srv
+	latest_qoes = QoE.objects.filter(srv=srv).order_by('-id')[:window]
+	qoe_num = latest_qoes.count()
+	total_qoe = 0.0
+	for qoe_obj in latest_qoes:
+		total_qoe = total_qoe + float(qoe_obj.qoe)
+	ave_sqs = total_qoe / float(qoe_num)
+
+	update_overlay_qoe(srv, exp_sqs, ave_sqs)
 
 # ================================================================================
 # Dump all the QoE data
@@ -112,12 +121,13 @@ def dumpQoE():
 # @input : srv ---- the server to update qoe
 #	   qoe ---- new qoe value to be updated in overlay table
 # ================================================================================
-def update_overlay_qoe(srv, qoe):
+def update_overlay_qoe(srv, exp_sqs, ave_sqs):
 	srv_id = int(re.findall(r'\d+', srv)[0])
 	srv_obj = Server.objects.get(pk=srv_id)
-	srv_obj.qoe = qoe
+	srv_obj.exp_sqs = exp_sqs
+	srv_obj.ave_sqs = ave_sqs
 	srv_obj.save()
-	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
+	print('Successfully update sqs for server, ', srv, ' in the overlay table!')
 
 # ================================================================================
 # Define a function to update a file to a google cloud storage bucket

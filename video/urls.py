@@ -8,4 +8,5 @@ urlpatterns = [
 	url(r'^add/', views.add, name='add'),
 	url(r'^discover/', views.discover, name='discover'),
 	url(r'^getSrv', views.getSrv, name='getSrv'),
+	url(r'^getCandidates', views.getCandidates, name='getCandidates'),
 ]

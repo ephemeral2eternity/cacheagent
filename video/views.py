@@ -99,10 +99,44 @@ def getSrv(request):
 			method = request_dict['method'][0]
 		else:
 			method = 'qoe'
-		# Call the get_server method 
-		srv_dict = get_server(vidID, method)
+
+		if method == 'qoe':
+			if 'sqs' in request_dict.keys():
+				sqs_method = request_dict['sqs'][0]
+			else:
+				sqs_method = 'exp'
+			if 'action' in request_dict.keys():
+				action = request_dict['action'][0]
+			else:
+				action = 'greedy'
+			if 'epsilon' in request_dict.keys():
+				epsilon = request_dict['epsilon'][0]
+			else:
+				epsilon = 0.1
+			# Call the get_server method 
+			srv_dict = get_server(vidID, method, sqs_method, action, epsilon)
+		else:
+			srv_dict = get_server(vidID, method, sqs_method, action, epsilon)
 	else:
 		raise Http404
 	response = HttpResponse(str(srv_dict))
 	response['Params'] = json.dumps(srv_dict)
+	return response	
+
+# ================================================================================
+# Return all candidate servers to the user
+# ================================================================================
+@csrf_exempt
+def getCandidates(request):
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	request_dict = urllib.parse.parse_qs(params)
+	print(request_dict)
+	if 'vidID' in request_dict.keys():
+		vidID = int(request_dict['vidID'][0])
+		candidates = get_candidates(vidID)
+	else:
+		raise Http404
+	response = HttpResponse(str(candidates))
+	response['Params'] = json.dumps(candidates)
 	return response	
