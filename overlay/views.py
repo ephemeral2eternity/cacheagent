@@ -13,7 +13,7 @@ from video.video_utils import *
 # Create your views here.
 # The page returned for the request: http://cache_agent_ip:port/overlay/
 def index(request):
-	lastManager = Manager.objects.all()[0]
+	lastManager = Manager.objects.order_by('-pk')[0]
 	return HttpResponse("The latest manager obtained is :" + lastManager.ip + ". Please check if the manager is on!")
 
 def initManager(request):
