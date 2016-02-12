@@ -4,7 +4,7 @@ import re
 import subprocess
 import urllib.request
 import urllib.parse
-from overlay.models import Server, Peer
+from overlay.models import Manager, Server, Peer
 from video.video_utils import *
 from qoe.qoe_utils import *
 from monitor.cache_monitor import *
@@ -16,35 +16,32 @@ from overlay.ping import *
 #	    keys are denoting name, zone, type, ip of all cache agents
 # ================================================================================
 def get_cache_agents():
-        # List all instances
-        proc = subprocess.Popen("gcloud compute instances list", stdout=subprocess.PIPE, shell=True)
-        (out, err) = proc.communicate()
-        print("All instances:")
-        print(out)
-        cache_agents = []
-        if out:
-                lines = out.splitlines()
-                instances = lines[1:]
-                for node_str in instances:
-                        items = re.split('\s+', node_str.decode())
-                        if "cache" in items[0]:
-                                node = {}
-                                node['name'] = str(items[0])
-                                node['zone'] = str(items[1])
-                                node['type'] = str(items[2])
-                                node['ip'] = str(items[4])
-                                cache_agents.append(node)
-
-        return cache_agents
-
+	managers = Manager.objects.all()
+	manager_count = managers.count()
+	if manager_count > 0:
+		lastManager = managers[0]
+		manager_ip = lastManager.ip
+		url = 'http://%s:8000/overlay/node/'%manager_ip
+		try:
+			req = urllib.request.Request(url)
+			rsp = urllib.request.urlopen(req)
+			rsp_headers = rsp.info()
+			cache_agents = json.loads(rsp_headers['Params'])
+			print(cache_agents)
+			return cache_agents
+		except:
+			print("Cannot connect the manager ", manager_ip, " to obtain the cache agents!")
+			return None
+	else:
+		print("There is no existing manager configured!")
+		return None
+	
 # ================================================================================
 # Get all cache agent names as a list
 # ================================================================================
 def get_cache_agent_names():
 	nodes = get_cache_agents()
-	agent_names = []
-	for node in nodes:
-		agent_names.append(node['name'])
+	agent_names = nodes.keys()
 	return agent_names
 
 # ================================================================================
@@ -55,13 +52,7 @@ def get_cache_agent_names():
 # ================================================================================
 def get_cache_agent_ips():
         cache_agents = get_cache_agents()
-
-        # List all instances
-        agent_ips = {}
-        for node in cache_agents:
-                agent_ips[node['name']] = node['ip']
-
-        return agent_ips
+        return cache_agents
 
 # ================================================================================
 # Get an IP addresses of one cache agent
@@ -92,7 +83,10 @@ def init_overlay_table():
 	existing_srvs = Server.objects.all()
 	if existing_srvs.count() > 0:
 		existing_srvs.delete()
-	cache_srv_ips = get_cache_agent_ips()
+	cache_srv_ips = get_cache_agents()
+	print(cache_srv_ips)
+	if not cache_srv_ips:
+		return False
 	hostname = get_host_name()
 	print("Obtained cache_srv_ips are", cache_srv_ips)
 	print("Current host name is :", hostname)
@@ -113,6 +107,7 @@ def init_overlay_table():
 		print(srv_name, " is saved in the database!")
 		if not isLocal:
 			add_cur_node(srv_ip)
+	return True
 
 # ================================================================================
 # Add the closest available agent as the peer agent
@@ -126,12 +121,13 @@ def connect_overlay():
 	while to_connect:
 		if peer_with(to_connect):
 			print("Successfull peer with agent: ", to_connect['name'])
-			return
+			return True
 		else:
 			other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
 			to_connect = find_closest(other_srv_list)
 	
 	print("There are no other cache agents running to peer with!")
+	return False
 
 # ================================================================================
 # Remove a dict element from a dict list

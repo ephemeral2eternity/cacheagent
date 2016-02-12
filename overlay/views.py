@@ -5,7 +5,7 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.http import HttpResponse
-from overlay.models import Server, Peer
+from overlay.models import Manager, Server, Peer
 from overlay.overlay_utils import *
 from overlay.ping import *
 from video.video_utils import *
@@ -13,17 +13,31 @@ from video.video_utils import *
 # Create your views here.
 # The page returned for the request: http://cache_agent_ip:port/overlay/
 def index(request):
-	return HttpResponse("Please come back later. The site is under construction!")
+	lastManager = Manager.objects.all()[0]
+	return HttpResponse("The latest manager obtained is :" + lastManager.ip + ". Please check if the manager is on!")
+
+def initManager(request):
+	# Get the centralized manager and save it to Overlay Model.
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	print("Got manager ip address as: ", params)
+	newManager = Manager(ip=params)
+	newManager.save()
+	num_manager = Manager.objects.all().count()
+	return HttpResponse('Successfully update monitored new manager ip ' + params + "; Now Manager has " + str(num_manager) + " used managers!")
 
 @csrf_exempt
 def initServer(request):
-	init_overlay_table()
+	isSuccess = init_overlay_table()
+
+	if not isSuccess:
+		return HttpResponse("Not able to obtain the cache agent list. Please initialize the centralized manager first!")
 
 	# Delete all objects in the table Peer
 	existing_peers = Peer.objects.all()
 	if existing_peers.count() > 0:
 		existing_peers.delete()
-	connect_overlay()
+	isSuccess = connect_overlay()
 	return query(request)
 
 @csrf_exempt
@@ -34,12 +48,12 @@ def query(request):
 	peer_list = Peer.objects.all()
 	# print("The current host is:", cur_srv[0].name)
 	templates = loader.get_template('overlay/servers.html')
-	context = RequestContext(request, {
-					'curSrv' : cur_srv[0],
-					'srvs' : srv_list,
-					'peers' : peer_list,
-	})
-	rsp = HttpResponse(templates.render(context))
+	#context = RequestContext(request, {
+	#				'curSrv' : cur_srv[0],
+	#				'srvs' : srv_list,
+	#				'peers' : peer_list,
+	#})
+	rsp = HttpResponse(templates.render({'curSrv' : cur_srv[0], 'srvs' : srv_list, 'peers' : peer_list}, request))
 	rsp['agens-peers'] = ', '.join(peer.name for peer in peer_list)
 	return rsp
 

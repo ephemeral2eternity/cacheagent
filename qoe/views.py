@@ -27,11 +27,11 @@ def query(request):
 	qoe_dict = getQoEStr()
 	print(qoe_dict)
 	templates = loader.get_template('qoe/qoes.html')
-	context = RequestContext(request, {
-					'localhost' : cur_host,
-					'qoes' : qoe_dict,
-	})
-	return HttpResponse(templates.render(context))
+	#context = RequestContext(request, {
+	#				'localhost' : cur_host,
+	#				'qoes' : qoe_dict,
+	#})
+	return HttpResponse(templates.render({'localhost':cur_host,'qoes':qoe_dict}, request))
 
 @csrf_exempt
 def update(request):

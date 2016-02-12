@@ -28,11 +28,11 @@ def query(request):
 	vid_list = Video.objects.all()
 	cur_host = get_local_name()
 	templates = loader.get_template('video/videos.html')
-	context = RequestContext(request, {
-					'videos' : vid_list,
-					'host' : cur_host,
-	})
-	return HttpResponse(templates.render(context))
+	#context = RequestContext(request, {
+	#				'videos' : vid_list,
+	#				'host' : cur_host,
+	#})
+	return HttpResponse(templates.render({'videos':vid_list,'host':cur_host}, request))
 
 @csrf_exempt
 def discover(request):

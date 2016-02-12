@@ -3,6 +3,7 @@ from overlay import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
+	url(r'^initManager', views.initManager, name='initManager'),
 	url(r'^remove', views.delete_obj, name='delete_obj'),
 	url(r'^init/', views.initServer, name='init'),
 	url(r'^query/', views.query, name='query'),

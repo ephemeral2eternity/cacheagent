@@ -21,22 +21,22 @@ def view_load(request):
 	local_host = get_host_name()
 	load_list = Load.objects.order_by('-pk')[:30]
 	template = loader.get_template('monitor/load.html')
-	context = RequestContext(request, {
-					'cur_host':local_host,
-					'load_list':load_list,
-	})
-	return HttpResponse(template.render(context))
+	#context = RequestContext(request, {
+	#				'cur_host':local_host,
+	#				'load_list':load_list,
+	#})
+	return HttpResponse(template.render({'cur_host':local_host,'load_list':load_list}, request))
 
 @csrf_exempt
 def view_bw(request):
 	local_host = get_host_name()
 	bw_list = BW.objects.order_by('-pk')[:30]
 	template = loader.get_template('monitor/bw.html')
-	context = RequestContext(request, {
-					'cur_host':local_host,
-					'bw_list':bw_list,
-	})
-	return HttpResponse(template.render(context))
+	#context = RequestContext(request, {
+	#				'cur_host':local_host,
+	#				'bw_list':bw_list,
+	#})
+	return HttpResponse(template.render({'cur_host':local_host,'bw_list':bw_list},request))
 
 # Show the recent system status monitored
 @csrf_exempt
@@ -44,22 +44,22 @@ def view_sys_stat(request):
 	local_host = get_host_name()
 	sys_stat_list = SYS_STAT.objects.order_by('-pk')[:30]
 	template = loader.get_template('monitor/sys_stats.html')
-	context = RequestContext(request, {
-					'cur_host':local_host,
-					'sys_stat_list':sys_stat_list,
-	})
-	return HttpResponse(template.render(context))
+	#context = RequestContext(request, {
+	#				'cur_host':local_host,
+	#				'sys_stat_list':sys_stat_list,
+	#})
+	return HttpResponse(template.render({'cur_host':local_host,'sys_stat_list':sys_stat_list}, request))
 
 @csrf_exempt
 def view_rtts(request):
 	local_host = get_host_name()
 	rtts_list = RTTS.objects.order_by('-pk')[:30]
 	template = loader.get_template('monitor/rtts.html')
-	context = RequestContext(request, {
-					'cur_host':local_host,
-					'rtts' : rtts_list,
-	})
-	return HttpResponse(template.render(context))
+	#context = RequestContext(request, {
+	#				'cur_host':local_host,
+	#				'rtts' : rtts_list,
+	#})
+	return HttpResponse(template.render({'cur_host':local_host, 'rtts':rtts_list}, request))
 
 @csrf_exempt
 def dump(request):

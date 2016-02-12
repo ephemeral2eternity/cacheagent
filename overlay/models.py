@@ -1,6 +1,11 @@
 from django.db import models
 from decimal import Decimal
 
+class Manager(models.Model):
+	ip = models.CharField(max_length=20)
+	def __str__(self):
+		self.ip
+
 # Save all the cache servers in overlay.Server model
 class Server(models.Model):
 	name = models.CharField(max_length=20)

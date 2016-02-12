@@ -17,5 +17,6 @@ screen
 cd ~/cacheagent
 python3 manage.py makemigrations client home monitor overlay qoe video
 python3 manage.py migrate
+python3 manage.py migrate --sync-db
 python3 manage.py runserver 0.0.0.0:8615
 ```
