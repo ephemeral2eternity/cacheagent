@@ -19,7 +19,7 @@ def get_cache_agents():
 	managers = Manager.objects.all()
 	manager_count = managers.count()
 	if manager_count > 0:
-		lastManager = managers[0]
+		lastManager = managers[manager_count - 1]
 		manager_ip = lastManager.ip
 		url = 'http://%s:8000/overlay/node/'%manager_ip
 		try:
