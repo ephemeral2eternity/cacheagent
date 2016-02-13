@@ -6,6 +6,7 @@ import re
 import urllib.request
 import urllib.parse
 import random
+import json
 from overlay.models import Manager, Server, Peer
 from video.models import Video
 
@@ -16,20 +17,20 @@ def get_local_videos():
 	latest_manager = Manager.objects.order_by('-pk')[0]
 	manager_ip = latest_manager.ip
 	url = "http://%s:8000/video/query/"%manager_ip
+	try:
+		req = urllib.request.Request(url)
+		rsp = urllib.request.urlopen(req)
+		rsp_headers = rsp.info()
+		content_caching = json.loads(rsp_headers['Params'])
+		# print(content_caching)
+	except:
+		print("Cannot connect to the manager " + manager_ip + " to obtain the cached video list!")
+		return None
 	#full_path = os.path.realpath(__file__)
 	#cur_folder, cur_file = ntpath.split(full_path)
 	#vidlist_folder = cur_folder + '/vidlists/'
 	hostname = get_local_name()
-
-	#vidlist_file = vidlist_folder + hostname
-	#f = open(vidlist_file, 'r')
-
-	#vidlist = []
-	#for line in f:
-	#	vid_id = int(line)
-	#	vidlist.append(vid_id)
-
-	# print(vidlist)
+	vidlist = content_caching[hostname].split(',')
 	return vidlist
 
 # ==============================================================
@@ -85,7 +86,7 @@ def forward_updates(rcv_host, video_updates):
 def update_videos(peer_ip, caching_list):
 	local_host = get_local_name()
 	url = 'http://%s:8615/video/add/'%peer_ip
-	print(url)
+	# print(url)
 	update_data = urllib.parse.urlencode(caching_list)
 	data = update_data.encode('utf-8')
 
@@ -94,7 +95,7 @@ def update_videos(peer_ip, caching_list):
 	req.add_header('agens-remote', local_host)
 	rsp = urllib.request.urlopen(req)
 	rspData = rsp.read()
-	print(rspData)
+	# print(rspData)
 
 # ================================================================================
 # Change the dictionary of list for video updates to the string version
@@ -195,11 +196,14 @@ def init_cache_table():
 	if existing_videos.count() > 0:
 		existing_videos.delete()
 	cached_videos = get_local_videos()
+	# print(cached_videos)
 	real_cached_videos = get_real_local_videos()
+	# print(real_cached_videos)
+	num_real_videos = len(real_cached_videos)
 	hostname = get_local_name()
 	for vid in cached_videos:
-		vid_id = vid
-		vid_name = real_cached_videos[vid_id%3]
+		vid_id = int(vid)
+		vid_name = real_cached_videos[vid_id%num_real_videos]
 		# vid_name = random.choice(real_cached_videos)
 		vid_srvs = hostname + ', '
 		cur_vid = Video(id=vid_id, name=vid_name, srvs=vid_srvs)
