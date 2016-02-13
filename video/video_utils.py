@@ -6,25 +6,28 @@ import re
 import urllib.request
 import urllib.parse
 import random
-from overlay.models import Server, Peer
+from overlay.models import Manager, Server, Peer
 from video.models import Video
 
 # ==============================================================
 # Retrieve cache table from local file lists
 # ==============================================================
 def get_local_videos():
-	full_path = os.path.realpath(__file__)
-	cur_folder, cur_file = ntpath.split(full_path)
-	vidlist_folder = cur_folder + '/vidlists/'
+	latest_manager = Manager.objects.order_by('-pk')[0]
+	manager_ip = latest_manager.ip
+	url = "http://%s:8000/video/query/"%manager_ip
+	#full_path = os.path.realpath(__file__)
+	#cur_folder, cur_file = ntpath.split(full_path)
+	#vidlist_folder = cur_folder + '/vidlists/'
 	hostname = get_local_name()
 
-	vidlist_file = vidlist_folder + hostname
-	f = open(vidlist_file, 'r')
+	#vidlist_file = vidlist_folder + hostname
+	#f = open(vidlist_file, 'r')
 
-	vidlist = []
-	for line in f:
-		vid_id = int(line)
-		vidlist.append(vid_id)
+	#vidlist = []
+	#for line in f:
+	#	vid_id = int(line)
+	#	vidlist.append(vid_id)
 
 	# print(vidlist)
 	return vidlist
