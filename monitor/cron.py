@@ -22,7 +22,7 @@ class sys_stat_job(CronJobBase):
 	"""
 
 	# Run every 1 minute
-	run_every = 1
+	run_every = 5
 	schedule = Schedule(run_every_mins=run_every)
 	code = 'monitor.cron.sys_stat_job'
 
