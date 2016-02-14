@@ -7,11 +7,11 @@ class video_update_job(CronJobBase):
 	"""
 
 	# Run every 1 hour
-	run_every = 600
+	run_every = 60
 	schedule = Schedule(run_every_mins=run_every)
 	code = 'video.cron.video_update_job'
 
-	# This will be executed every 10 hour
+	# This will be executed every 1 hour
 	def do(self):
 		periodic_discover()
 		

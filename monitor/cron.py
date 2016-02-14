@@ -16,6 +16,7 @@ class load_job(CronJobBase):
 		load_monitor()
 		bw_monitor()
 
+'''
 class sys_stat_job(CronJobBase):
 	"""
 	Cron Job that checks the server cpu, mem, io, bw and add these info to the db
@@ -29,6 +30,7 @@ class sys_stat_job(CronJobBase):
 	# This will be executed every 1 minute
 	def do(self):
 		sys_monitor()
+'''
 
 class monitor_dump_job(CronJobBase):
 	# Run every day at mid night
