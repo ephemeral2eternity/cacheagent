@@ -74,7 +74,7 @@ def get_host_name():
 # ================================================================================
 def init_overlay_table():
 	# Initialize the video cache table first
-	init_cache_table()
+	# init_cache_table()
 	
 	# Initialize the qoe table
 	initializeQoE()
