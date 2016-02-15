@@ -24,7 +24,7 @@ def get_cache_agents():
 		url = 'http://%s:8000/overlay/node/'%manager_ip
 		try:
 			req = urllib.request.Request(url)
-			rsp = urllib.request.urlopen(req)
+			rsp = urllib.request.urlopen(req, timeout=10)
 			rsp_headers = rsp.info()
 			cache_agents = json.loads(rsp_headers['Params'])
 			print(cache_agents)
@@ -193,7 +193,7 @@ def peer_with(peer):
 
 	try:
 		req = urllib.request.Request(url, data)
-		rsp = urllib.request.urlopen(req)
+		rsp = urllib.request.urlopen(req,timeout=10)
 		rsp_data = rsp.read()
 		print(rsp_data)
 		peer_name = peer['name']
@@ -229,7 +229,7 @@ def remove_peer_with(cur_node, peer_ip):
 	url = 'http://%s:8615/overlay/remove?peer=%s'%(peer_ip, cur_node)
 	try:
 		req = urllib.request.Request(url)
-		rsp = urllib.request.urlopen(req)
+		rsp = urllib.request.urlopen(req,timeout=10)
 		print("Remove", cur_node, "from the remote peer agent's peer list!")
 		return True
 	except:
@@ -242,7 +242,7 @@ def remove_srv(cur_node, remote_ip):
 	url = 'http://%s:8615/overlay/remove?srv=%s'%(remote_ip, cur_node)
 	try:
 		req = urllib.request.Request(url)
-		rsp = urllib.request.urlopen(req)
+		rsp = urllib.request.urlopen(req,timeout=10)
 		print("Remove", cur_node, "from the remote peer agent's peer list!")
 		return True
 	except:
@@ -314,7 +314,7 @@ def add_cur_node(srv_ip):
 	url = 'http://%s:8615/overlay/add?srv=%s'%(srv_ip, cur_node_name)
 	try:
 		req = urllib.request.Request(url)
-		rsp = urllib.request.urlopen(req)
+		rsp = urllib.request.urlopen(req,timeout=10)
 		print("Add", cur_node, "to the remote server agent's overlay table!")
 		return True
 	except:
