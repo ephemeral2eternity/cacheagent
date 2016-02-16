@@ -139,7 +139,10 @@ def get_overlay_nodes():
 # Notify the centralized manager
 # ================================================================================
 def add_overlay(node, to_connect=None):
-	print("Entering add_overlay() to connect" + node + " to " + to_connect + " in the overlay!")
+	if not to_connect:
+		print("Entering add_overlay() to connect" + node + " to " + to_connect + " in the overlay!")
+	else:
+		print("Entering add_overlay() to add" + node + " as the first node in the overlay!")
 	managers = Manager.objects.all()
 	manager_count = managers.count()
 	if manager_count > 0:
