@@ -116,7 +116,7 @@ def getSrv(request):
 			# Call the get_server method 
 			srv_dict = get_server(vidID, method, sqs_method, action, epsilon)
 		else:
-			srv_dict = get_server(vidID, method, sqs_method, action, epsilon)
+			srv_dict = get_server(vidID, method)
 	else:
 		raise Http404
 	response = HttpResponse(str(srv_dict))
