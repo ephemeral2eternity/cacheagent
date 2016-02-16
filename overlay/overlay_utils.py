@@ -76,8 +76,6 @@ def init_overlay_table():
 	# Initialize the video cache table first
 	# init_cache_table()
 	
-	# Initialize the qoe table
-	initializeQoE()
 
 	# Delete all objects in the table
 	existing_srvs = Server.objects.all()
@@ -105,8 +103,9 @@ def init_overlay_table():
 		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, ave_sqs=srv_sqs, exp_sqs=srv_sqs, load=srv_load, bw=srv_bw)
 		cur_srv.save()
 		print(srv_name, " is saved in the database!")
-		if not isLocal:
-			add_cur_node(srv_ip)
+	
+	# Initialize the qoe table
+	initializeQoE()
 	return True
 
 # ================================================================================
@@ -195,6 +194,8 @@ def connect_overlay():
 				to_connect = find_closest(other_srv_list)
 		
 		if add_overlay(myName, to_connect['name']):
+			for node in other_srvs:
+				add_cur_node(node.ip)
 			return True
 	else:
 		if add_overlay(myName):
