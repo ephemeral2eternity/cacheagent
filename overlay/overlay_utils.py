@@ -354,20 +354,23 @@ def delete_node():
 # @input : node_name ---- the name of remote node
 # ================================================================================
 def add_srv(node_name):
-	hostname = get_host_name()
-	srv_id = int(re.findall(r'\d+', node_name)[0])
-	srv_name = node_name
-	srv_ip = get_node_ip(node_name)
-	srv_rtt = getMnRTT(srv_ip, 5)
-	srv_qoe = 4.00
-	srv_load = 0
-	srv_bw = 0.00
-	isLocal = (node_name == hostname)
-	if isLocal:
-		srv_rtt = 0.0
-		srv_qoe = 5.00
-	cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
-	cur_srv.save()
+	if not Server.objects.filter(name=node_name).exists():
+		hostname = get_host_name()
+		srv_id = int(re.findall(r'\d+', node_name)[0])
+		srv_name = node_name
+		srv_ip = get_node_ip(node_name)
+		srv_rtt = getMnRTT(srv_ip, 5)
+		ave_sqs = 4.00
+		exp_sqs = 4.00
+		srv_load = 0
+		srv_bw = 0.00
+		isLocal = (node_name == hostname)
+		if isLocal:
+			srv_rtt = 0.0
+			ave_sqs = 5.00
+			exp_sqs = 5.00
+		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
+		cur_srv.save()
 	print(srv_name, " is saved in the database!")
 
 # ================================================================================
