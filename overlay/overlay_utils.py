@@ -140,7 +140,7 @@ def get_overlay_nodes():
 # ================================================================================
 def add_overlay(node, to_connect=None):
 	if to_connect is None:
-		print("Entering add_overlay() to add" + node + " as the first node in the overlay!")
+		print("Entering add_overlay() to add " + node + " as the first node in the overlay!")
 	else:
 		print("Entering add_overlay() to connect" + node + " to " + to_connect + " in the overlay!")
 	managers = Manager.objects.all()
@@ -171,25 +171,30 @@ def add_overlay(node, to_connect=None):
 def connect_overlay():
 	print("Entering connect_overlay()!")
 	overlay_nodes = get_overlay_nodes()
+	print("Back to connect_overlay()!")
 	print("The current overlay nodes:" + str(overlay_nodes))
 	myName = get_host_name()
-	if not overlay_nodes:
+	if overlay_nodes:
 		other_srvs = []
 		for node_name in overlay_nodes.keys():
-			cur_node_info = Server.objects.get(name=node_name)
-			other_srvs.append(cur_node_info)
+			if node_name != myName:
+				print("Read info for overlay node: " + node_name)
+				cur_node_info = Server.objects.get(name=node_name)
+				other_srvs.append(cur_node_info)
 		other_srv_list = object2list(other_srvs)
+		print("Overlay node detailed info: " + str(other_srv_list))
 		# Find the closest node to peer with
 	
 		to_connect = find_closest(other_srv_list)
 		while to_connect:
 			if peer_with(to_connect):
 				print("Successfull peer with agent: ", to_connect['name'])
+				break
 			else:
 				other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
 				to_connect = find_closest(other_srv_list)
 		
-		if add_overlay(myName, to_connect):
+		if add_overlay(myName, to_connect['name']):
 			return True
 	else:
 		if add_overlay(myName):
