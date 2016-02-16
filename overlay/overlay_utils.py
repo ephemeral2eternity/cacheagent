@@ -116,6 +116,7 @@ def get_overlay_nodes():
 	print("Entering get_overlay_nodes() to get existing overlay nodes!")
 	managers = Manager.objects.all()
 	manager_count = managers.count()
+	overlay_nodes = {}
 	if manager_count > 0:
 		lastManager = managers[manager_count - 1]
 		manager_ip = lastManager.ip
@@ -124,15 +125,14 @@ def get_overlay_nodes():
 			req = urllib.request.Request(url)
 			rsp = urllib.request.urlopen(req, timeout=10)
 			rsp_headers = rsp.info()
-			cache_agents = json.loads(rsp_headers['Params'])
-			print(cache_agents)
-			return cache_agents
+			overlay_nodes = json.loads(rsp_headers['Params'])
+			print(overlay_nodes)
 		except:
 			print("Cannot connect the manager ", manager_ip, " to obtain available overlay nodes!")
-			return None
 	else:
 		print("There is no existing manager configured!")
-		return None
+	return overlay_nodes
+	
 	
 
 # ================================================================================
@@ -171,6 +171,7 @@ def add_overlay(node, to_connect=None):
 def connect_overlay():
 	print("Entering connect_overlay()!")
 	overlay_nodes = get_overlay_nodes()
+	print("The current overlay nodes:" + str(overlay_nodes))
 	myName = get_host_name()
 	if not overlay_nodes:
 		other_srvs = []
