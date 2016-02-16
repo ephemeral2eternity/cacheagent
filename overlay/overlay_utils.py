@@ -110,23 +110,84 @@ def init_overlay_table():
 	return True
 
 # ================================================================================
+# Query for available nodes in the overlay network
+# ================================================================================
+def get_overlay_nodes():
+	managers = Manager.objects.all()
+	manager_count = managers.count()
+	if manager_count > 0:
+		lastManager = managers[manager_count - 1]
+		manager_ip = lastManager.ip
+		url = 'http://%s:8000/overlay/overlaynode/'%manager_ip
+		try:
+			req = urllib.request.Request(url)
+			rsp = urllib.request.urlopen(req, timeout=10)
+			rsp_headers = rsp.info()
+			cache_agents = json.loads(rsp_headers['Params'])
+			print(cache_agents)
+			return cache_agents
+		except:
+			print("Cannot connect the manager ", manager_ip, " to obtain available overlay nodes!")
+			return None
+	else:
+		print("There is no existing manager configured!")
+		return None
+	
+
+# ================================================================================
+# Notify the centralized manager
+# ================================================================================
+def add_overlay(node, to_connect=None):
+	managers = Manager.objects.all()
+	manager_count = managers.count()
+	if manager_count > 0:
+		lastManager = managers[manager_count - 1]
+		manager_ip = lastManager.ip
+		if not to_connect:
+			url = 'http://%s:8000/overlay/add?src=%s&dst=%s' % (manager_ip, node, to_connect)
+		else:
+			url = 'http://%s:8000/overlay/add?src=%s' % (manager_ip, node)
+		try:
+			req = urllib.request.Request(url)
+			rsp = urllib.request.urlopen(req, timeout=10)
+			print(rsp)
+			return True
+		except:
+			print("Cannot connect the manager ", manager_ip, " to obtain available overlay nodes!")
+	else:
+		print("There is no existing manager configured!")
+	return False
+	
+
+
+# ================================================================================
 # Add the closest available agent as the peer agent
 # ================================================================================
 def connect_overlay():
-	other_srvs = Server.objects.filter(isLocal=False)
-	other_srv_list = object2list(other_srvs)
-	# Find the closest node to peer with
+	overlay_nodes = get_overlay_nodes()
+	myName = get_host_name()
+	if not overlay_nodes:
+		other_srvs = []
+		for node_name in overlay_nodes.keys():
+			cur_node_info = Server.objects.get(name=node_name)
+			other_srvs.append(cur_node_info)
+		other_srv_list = object2list(other_srvs)
+		# Find the closest node to peer with
 	
-	to_connect = find_closest(other_srv_list)
-	while to_connect:
-		if peer_with(to_connect):
-			print("Successfull peer with agent: ", to_connect['name'])
+		to_connect = find_closest(other_srv_list)
+		while to_connect:
+			if peer_with(to_connect):
+				print("Successfull peer with agent: ", to_connect['name'])
+			else:
+				other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
+				to_connect = find_closest(other_srv_list)
+		
+		if add_overlay(myName, to_connect):
 			return True
-		else:
-			other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
-			to_connect = find_closest(other_srv_list)
-	
-	print("There are no other cache agents running to peer with!")
+	else:
+		if add_overlay(myName):
+			return True
+
 	return False
 
 # ================================================================================
