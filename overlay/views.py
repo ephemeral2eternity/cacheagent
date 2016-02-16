@@ -1,5 +1,6 @@
 import re
 import urllib
+import json
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -33,12 +34,20 @@ def initServer(request):
 	if not isSuccess:
 		return HttpResponse("Not able to obtain the cache agent list. Please initialize the centralized manager first!")
 
+	return query(request)
+
+def connect(request):
 	# Delete all objects in the table Peer
 	existing_peers = Peer.objects.all()
 	if existing_peers.count() > 0:
 		existing_peers.delete()
 	isSuccess = connect_overlay()
-	return query(request)
+	peer_list = Peer.objects.all()
+	peer_dict = {}
+	for peer in peer_list:
+		peer_dict[peer.name] = peer.ip
+	return HttpResponse("Added peers:" + json.dump(peer_dict))
+
 
 @csrf_exempt
 def query(request):

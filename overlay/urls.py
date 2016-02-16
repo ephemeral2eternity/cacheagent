@@ -6,6 +6,7 @@ urlpatterns = [
 	url(r'^initManager', views.initManager, name='initManager'),
 	url(r'^remove', views.delete_obj, name='delete_obj'),
 	url(r'^init/', views.initServer, name='init'),
+	url(r'^connect/', views.connect, name='connect'),
 	url(r'^query/', views.query, name='query'),
 	url(r'^update', views.update, name='update'),
 	url(r'^peer/', views.peer, name='peer'),
