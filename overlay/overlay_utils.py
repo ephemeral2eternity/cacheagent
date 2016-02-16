@@ -148,7 +148,7 @@ def add_overlay(node, to_connect=None):
 	if manager_count > 0:
 		lastManager = managers[manager_count - 1]
 		manager_ip = lastManager.ip
-		if not to_connect:
+		if to_connect is not None:
 			url = 'http://%s:8000/overlay/add?src=%s&dst=%s' % (manager_ip, node, to_connect)
 		else:
 			url = 'http://%s:8000/overlay/add?src=%s' % (manager_ip, node)
