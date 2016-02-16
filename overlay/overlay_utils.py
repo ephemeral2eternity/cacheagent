@@ -371,7 +371,7 @@ def add_srv(node_name):
 			exp_sqs = 5.00
 		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
 		cur_srv.save()
-	print(srv_name, " is saved in the database!")
+	print(node_name, " is saved in the database!")
 
 # ================================================================================
 # Add current node to other servers' overlay table
