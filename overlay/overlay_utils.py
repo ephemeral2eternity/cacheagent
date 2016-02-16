@@ -113,6 +113,7 @@ def init_overlay_table():
 # Query for available nodes in the overlay network
 # ================================================================================
 def get_overlay_nodes():
+	print("Entering get_overlay_nodes() to get existing overlay nodes!")
 	managers = Manager.objects.all()
 	manager_count = managers.count()
 	if manager_count > 0:
@@ -138,6 +139,7 @@ def get_overlay_nodes():
 # Notify the centralized manager
 # ================================================================================
 def add_overlay(node, to_connect=None):
+	print("Entering add_overlay() to connect" + node + " to " + to_connect + " in the overlay!")
 	managers = Manager.objects.all()
 	manager_count = managers.count()
 	if manager_count > 0:
@@ -153,7 +155,7 @@ def add_overlay(node, to_connect=None):
 			print(rsp)
 			return True
 		except:
-			print("Cannot connect the manager ", manager_ip, " to obtain available overlay nodes!")
+			print("Cannot connect the manager ", manager_ip, " to add overlay nodes!")
 	else:
 		print("There is no existing manager configured!")
 	return False
@@ -164,6 +166,7 @@ def add_overlay(node, to_connect=None):
 # Add the closest available agent as the peer agent
 # ================================================================================
 def connect_overlay():
+	print("Entering connect_overlay()!")
 	overlay_nodes = get_overlay_nodes()
 	myName = get_host_name()
 	if not overlay_nodes:

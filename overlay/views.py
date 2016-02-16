@@ -42,11 +42,15 @@ def connect(request):
 	if existing_peers.count() > 0:
 		existing_peers.delete()
 	isSuccess = connect_overlay()
-	peer_list = Peer.objects.all()
-	peer_dict = {}
-	for peer in peer_list:
-		peer_dict[peer.name] = peer.ip
-	return HttpResponse("Added peers:" + json.dump(peer_dict))
+	if isSuccess:
+		peer_list = Peer.objects.all()
+		peer_dict = {}
+		for peer in peer_list:
+			peer_dict[peer.name] = peer.ip
+		rsp_str = "Successfully connected to the overlay network with peers: " + json.dumps(peer_dict)
+	else:
+		rsp_str = "Failed to connect to the overlay network!"
+	return HttpResponse(rsp_str)
 
 
 @csrf_exempt
