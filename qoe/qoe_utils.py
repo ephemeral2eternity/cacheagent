@@ -52,30 +52,32 @@ def getQoEStr():
 #	   qoe ---- new qoe value received for the srv
 #          alpha ---- the weight to be given to the new QoE value
 # ================================================================================
-def updateQoE(srv, qoe, alpha=0.1, window=6):
+def updateQoE(srv_ip, qoe, alpha=0.1, window=6):
 	## Revision by chenw-2015-0317, read QoE updated to overlay not the previous sample.
 	# last_qoe = QoE.objects.filter(srv=srv).order_by('-time')[0]
 	# print('Last qoe value for server ', srv, ' is ', last_qoe.qoe)
 	# previous_qoe = float(last_qoe.qoe)
-	new_qoe_obj = QoE(qoe=qoe, srv=srv)
+	srv_obj = Server.objects.filter(ip=srv_ip)[0]
+	srv_name = srv_obj.name
+	new_qoe_obj = QoE(qoe=qoe, srv=srv_name)
 	new_qoe_obj.save()
 	print('New qoe is ', qoe)
 	
 	## Get the server's previous exp_sqs and update exp_sqs
-	srv_id = int(re.findall(r'\d+', srv)[0])
-	srv_obj = Server.objects.get(pk=srv_id)
+	# srv_id = int(re.findall(r'\d+', srv)[0])
+	# srv_obj = Server.objects.filter(ip=srv)[0]
 	previous_exp_sqs= float(srv_obj.exp_sqs)
 	exp_sqs = (1 - alpha) * previous_exp_sqs + alpha * qoe
 
 	## Get the server's ave_sqs for server, srv
-	latest_qoes = QoE.objects.filter(srv=srv).order_by('-id')[:window]
+	latest_qoes = QoE.objects.filter(srv=srv_name).order_by('-id')[:window]
 	qoe_num = latest_qoes.count()
 	total_qoe = 0.0
 	for qoe_obj in latest_qoes:
 		total_qoe = total_qoe + float(qoe_obj.qoe)
 	ave_sqs = total_qoe / float(qoe_num)
 
-	update_overlay_qoe(srv, exp_sqs, ave_sqs)
+	update_overlay_qoe(srv_name, exp_sqs, ave_sqs)
 
 # ================================================================================
 # Dump all the QoE data
