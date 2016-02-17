@@ -110,7 +110,7 @@ def getSrv(request):
 			else:
 				action = 'greedy'
 			if 'epsilon' in request_dict.keys():
-				epsilon = request_dict['epsilon'][0]
+				epsilon = float(request_dict['epsilon'][0])
 			else:
 				epsilon = 0.1
 			# Call the get_server method 

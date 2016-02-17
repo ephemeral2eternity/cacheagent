@@ -155,8 +155,10 @@ def get_server(vidID, method, sqs_method='exp', action='greedy', epsilon=0.1):
 
 	# Select the server with the least value in srvs_vals
 	if action == "greedy":
+		print("Receiving get_server request with action " + action)
 		selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
 	elif action == "epsilon":
+		print("Receiving get_server request with action " + action)
 		rnd = random.random()
 		if rnd < epsilon:
 			selected_srv = random.choice(srvs_vals.keys())
